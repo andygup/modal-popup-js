@@ -66,14 +66,14 @@
     </div>
     <div id="modal-background" class="mod-popup-modal-background"></div>
 </div>
+
 <div id="map"></div>
 
-<!--<script src="dojo/dojo.js" data-dojo-config="async: true"></script>-->
 <script src="http://js.arcgis.com/3.10/"></script>
 <script>
     var map;
 
-    require(["esri/map", "esri/layers/ArcGISTiledMapServiceLayer", "dojo/domReady!"], function(Map,TiledMapServer) {
+    require(["esri/map","dojo/domReady!"], function(Map,TiledMapServer) {
 
         var closeBtn = document.getElementById("mod-popup-close-btn")
         var modPopup = document.getElementById("popup")
@@ -93,18 +93,13 @@
             },2000);
         });
 
-
         //http://stackoverflow.com/questions/2794148/css3-transition-events
         modPopup.addEventListener("webkitTransitionEnd",function(evt){
-            if(modPopup.style.width == "33%"){ console.log("webkit transition end")
-                modPopup.style.position = "absolute";
-            }
+            console.log("Webkit transition end")
         });
 
         modPopup.addEventListener("transitionend",function(evt){
-            if(modPopup.style.width == "33%"){ console.log("Transition end")
-                modPopup.style.position = "absolute";
-            }
+            console.log("Transition end");
         });
 
         function showPopup(){ console.log("SHOW")
