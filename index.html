@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+    <title>Simple Map</title>
+    <link rel="stylesheet" href="http://js.arcgis.com/3.10/js/esri/css/esri.css">
+    <style>
+        html, body, #map {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #FFF;
+            overflow: hidden;
+            font-family: "Trebuchet MS";
+        }
+        #map {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        #popup {
+            opacity: 0;
+            height: 0;
+            width: 0;
+            z-index: 98;
+            font-size: x-large;
+            position: absolute;
+            top: -9999;
+            left: -9999;
+        }
+        #popup-body {
+            position: relative;
+            top: 10%;
+            left: 10%;
+            z-index: 100;
+            height: 80%;
+            width: 80%;
+            border-radius: 10px;
+            background-color: black;
+            display: table;
+            opacity: 0.7;
+        }
+
+        .mod-popup-modal-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            opacity: 0.5;
+            background-color: black;
+            z-index: 99;
+            display: table;
+        }
+        .mod-popup-input {
+            border-bottom: solid #ffffff 1px;
+            width: 80%;
+            display: table-cell;
+            vertical-align: middle;
+            padding: 12px;
+        }
+        .mod-popup-label {
+            padding: 12px;
+            width: 20%;
+            display: table-cell;
+            vertical-align: middle;
+            background-color: dimgrey;
+        }
+        .mod-popup-label-top-left {
+            padding: 12px;
+            width: 20%;
+            display: table-cell;
+            vertical-align: middle;
+            background-color: dimgray;
+            border-top-left-radius: 10px;
+        }
+        .mod-popup-table-row {
+            color: white;
+            border-radius: 10px;
+            display: table-row;
+        }
+        .mod-popup-stop-input {
+            border-radius: 5px;
+            font-size: x-large;
+            width: 90%;
+            height: 75%;
+            padding: 5px;
+        }
+        .mod-popup-stop-input-disabled {
+            color: black;
+            border-radius: 5px;
+            font-size: x-large;
+            background-color: slategray;
+            padding: 5px;
+            width: 90%;
+            height: 75%;
+        }
+        .mod-popup-button {
+            position: relative;
+            float: left;
+            color: #ffffff;
+            font-size: x-large;
+            border-radius: 10px;
+            width: 45%;
+            padding: 8px;
+            background-color: #000000;
+            border: solid #ffffff 2px;
+        }
+        .mod-popup-button:active {
+            position: relative;
+            float: left;
+            color: #000000;
+            font-size: x-large;
+            border-radius: 10px;
+            width: 45%;
+            padding: 8px;
+            background-color: lightyellow;
+            border: solid #ffffff 2px;
+        }
+        .mod-popup-button-cancel {
+            position: relative;
+            float: left;
+            color: lightgray;
+            font-size: x-large;
+            border-radius: 10px;
+            width: 100%;
+            padding: 8px;
+            background-color: #000000;
+            border: solid lightgray 1px;
+        }
+        .mod-popup-button-cancel:active {
+            position: relative;
+            float: left;
+            color: #000000;
+            font-size: x-large;
+            border-radius: 10px;
+            width: 100%;
+            padding: 8px;
+            background-color: lightyellow;
+            border: solid lightgray 1px;
+        }
+
+        .mod-popup-button-cancel:hover {
+            -webkit-opacity: 1;
+            -moz-opacity: 1;
+            opacity: 1;
+            color: black;
+            background-color: #d3d3d3;
+            border: solid slategray 2px;
+        }
+
+        .mod-popup-button-div {
+            padding: 12px;
+            display: table-cell;
+            vertical-align: middle;
+            background-color: #000000;
+        }
+        .mod-popup-button-div-bottom-left {
+            padding: 12px;
+            display: table-cell;
+            vertical-align: middle;
+            background-color: #000000;
+            border-bottom-left-radius: 8px;
+        }
+        @media (max-width: 500px) {
+            .mod-popup-button {
+                font-size: small;
+            }
+            .mod-popup-button:active{
+                font-size: small;
+            }
+            .mod-popup-button-cancel {
+                font-size: small;
+            }
+            .mod-popup-button-cancel:active {
+                font-size: small;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="popup">
+    <div id="popup-body">
+        <div id="row1" class="mod-popup-table-row">
+            <div class="mod-popup-label-top-left">ID</div>
+            <div class="mod-popup-input">
+                <input id="stop-main-id" disabled class="mod-popup-stop-input-disabled" value="test"/>
+            </div>
+        </div>
+        <div id="row2" class="mod-popup-table-row">
+            <div class="mod-popup-label">Bustop ID</div>
+            <div class="mod-popup-input">
+                <input id="stop-id" disabled class="mod-popup-stop-input-disabled" value="test"/>
+            </div>
+        </div>
+        <div id="row3" class="mod-popup-table-row">
+            <div class="mod-popup-label">Routes</div>
+            <div class="mod-popup-input">
+                <input id="stop-routes" class="mod-popup-stop-input" value="test"/>
+            </div>
+        </div>
+        <div id="row4" class="mod-popup-table-row">
+            <div class="mod-popup-label">Stopnames</div>
+            <div class="mod-popup-input">
+                <input id="stop-names" class="mod-popup-stop-input" value="test"/>
+            </div>
+        </div>
+        <div id="row5" class="mod-popup-table-row">
+            <div class="mod-popup-button-div-bottom-left">
+                <button class="mod-popup-button-cancel" id="mod-popup-close-btn" >Close</button>
+            </div>
+            <div class="mod-popup-button-div">
+                <button class="mod-popup-button" style="margin-right: 10px;">Save</button>
+                <button class="mod-popup-button">Delete</button>
+            </div>
+        </div>
+    </div>
+    <div id="modal-background" class="mod-popup-modal-background"></div>
+</div>
+<div id="map"></div>
+
+<!--<script src="dojo/dojo.js" data-dojo-config="async: true"></script>-->
+<script src="http://js.arcgis.com/3.10/"></script>
+<script>
+    var map;
+
+    require(["esri/map", "esri/layers/ArcGISTiledMapServiceLayer", "dojo/domReady!"], function(Map,TiledMapServer) {
+
+        var closeBtn = document.getElementById("mod-popup-close-btn")
+        var modPopup = document.getElementById("popup")
+        var showPopupBtn = document.getElementById("showpop");
+
+        map = new Map("map", {
+            basemap: "topo",
+            center: [-122.45, 37.75], // longitude, latitude
+            zoom: 13
+        });
+
+
+        map.on("load",function(evt){
+            console.log("TEST")
+            window.setTimeout(function(){
+                showPopup();
+            },2000);
+        });
+
+
+        //http://stackoverflow.com/questions/2794148/css3-transition-events
+        modPopup.addEventListener("webkitTransitionEnd",function(evt){
+            if(modPopup.style.width == "33%"){ console.log("webkit transition end")
+                modPopup.style.position = "absolute";
+            }
+        });
+
+        modPopup.addEventListener("transitionend",function(evt){
+            if(modPopup.style.width == "33%"){ console.log("Transition end")
+                modPopup.style.position = "absolute";
+            }
+        });
+
+        function showPopup(){ console.log("SHOW")
+            modPopup.style.opacity = 1;
+            modPopup.style.left = 0;
+            modPopup.style.top = 0;
+            modPopup.style.width = "100%";
+            modPopup.style.height = "100%";
+            modPopup.style.transition = "all 1s linear 0s";
+        }
+
+        map.on("click",function(evt){
+            showPopup();
+        });
+
+        closeBtn.onclick = function(evt){
+            hidePopup();
+        }
+
+        function hidePopup(){
+            modPopup.style.height = "33%";
+            modPopup.style.width = "33%";
+            modPopup.style.opacity = 0;
+            modPopup.style.top = -9999;
+            modPopup.style.left = -9999;
+            modPopup.style.transition = "all 1s ease-in-out 0s";
+        }
+    });
+</script>
+
+</body>
+</html>
