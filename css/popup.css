@@ -142,7 +142,7 @@
     background-color: #000000;
     border-bottom-left-radius: 8px;
 }
-@media (max-width: 500px) {
+@media (min-width: 451) and (max-width: 500px) {
     .mod-popup-button {
         font-size: small;
     }
